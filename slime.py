@@ -4,90 +4,95 @@ import pygame
 H = 0
 V = 1
 
-BLANC  = ( 255, 255, 255)
-NOIR   = (0, 0, 0)
+blanc  = ( 255, 255, 255)
+noir   = (0, 0, 0)
 COUL = ( 255 , 0 , 0 )
 
-FENETRE_LARGEUR = 1280
-FENETRE_HAUTEUR = 720
+fenetre_l = 1280
+fenetre_h = 720
 
-CUL_JOUEUR_H = 10
-CUL_JOUEUR_L = 110
+cul_joueur_h = 10
+cul_joueur_l = 110
 
-BALLE_RAYON = 30
+balle_rayon = 30
 joueur_rayon = 60
 
 pygame.init()
 
-fenetre_taille = (FENETRE_LARGEUR, FENETRE_HAUTEUR)
+fenetre_taille = (fenetre_l, fenetre_h)
 fenetre = pygame.display.set_mode(fenetre_taille)
 
-fenetre.fill(BLANC)
+fenetre.fill(blanc)
 
-balle_position = [30, 30]
-balle_vitesse  = [5, 5]
+balle_position = [640.0, 50.0]
+balle_vitesse  = [0.0, 0.0]
 
-sol_position = [0, FENETRE_HAUTEUR - 50]
-sol2_position = [0, FENETRE_HAUTEUR - 53]
+sol_position = [0, fenetre_h - 50]
+sol2_position = [0, fenetre_h - 53]
 
 
 
-joueur1_position = [ 150 , FENETRE_HAUTEUR - 53]
-joueur2_position = [ FENETRE_LARGEUR - 150 , FENETRE_HAUTEUR - 53]
+joueur1_position = [ 150 , fenetre_h - 53]
+joueur2_position = [ fenetre_l - 150 , fenetre_h - 53]
 
 cul_position = [ joueur1_position[0]-joueur_rayon+5 , sol2_position[1]-10 ]
 
 fini = False
 temps = pygame.time.Clock()
 
+   
 #--- Boucle principale
 while not fini:
-    #--- Traiter entrées joueur
+    #--- Traiter entrees joueur
     for evenement in pygame.event.get():
         if evenement.type == pygame.QUIT:
             fini = True
 
     #--- Logique du jeu
     #balle_position[H] = balle_position[H] + balle_vitesse[H]
-    balle_position[V] = balle_position[V] + balle_vitesse[V]
+    #balle_position[V] += balle_vitesse[V]
+    balle_position[V] += (balle_vitesse[V]*(1/60) + ((9.81 * (1/60*1/60))/2))*100 #*100 car 100px = 1m
+    balle_vitesse[V] += 9.81 * (1/60)
 
-    if balle_position[H] + BALLE_RAYON >= FENETRE_LARGEUR:
-        balle_position[H] = FENETRE_LARGEUR - BALLE_RAYON
+    if balle_position[H] + balle_rayon >= fenetre_l:
+        balle_position[H] = fenetre_l - balle_rayon
         balle_vitesse[H] = -balle_vitesse[H]
     else:
-        if balle_position[H] < BALLE_RAYON:
-            balle_position[H] = BALLE_RAYON
+        if balle_position[H] < balle_rayon:
+            balle_position[H] = balle_rayon
             balle_vitesse[H] = -balle_vitesse[H]
 
-    if balle_position[V] + BALLE_RAYON >= sol2_position[1]:
-        balle_position[V] = sol2_position[1] - BALLE_RAYON
+    if balle_position[V] + balle_rayon >= sol2_position[1]:
+        balle_position[V] = sol2_position[1] - balle_rayon
         balle_vitesse[V] = -balle_vitesse[V]
     else:
-        if balle_position[V] < BALLE_RAYON:
-            balle_position[V] = BALLE_RAYON
+        if balle_position[V] < balle_rayon:
+            balle_position[V] = balle_rayon
             balle_vitesse[V] = -balle_vitesse[V]
+            
+    
 
-    #--- Dessiner l'écran
-    fenetre.fill(BLANC)
+    #--- Dessiner l ecran
+    fenetre.fill(blanc)
     #--- Dessin joueurs
-    pygame.draw.circle(fenetre, NOIR, joueur1_position, joueur_rayon)
-    pygame.draw.circle(fenetre, BLANC, joueur1_position, joueur_rayon-10)
-    pygame.draw.rect(fenetre, NOIR , (cul_position, (CUL_JOUEUR_L , CUL_JOUEUR_H)))
+    pygame.draw.circle(fenetre, noir, joueur1_position, joueur_rayon)
+    pygame.draw.circle(fenetre, blanc, joueur1_position, joueur_rayon-10)
+    pygame.draw.rect(fenetre, noir , (cul_position, (cul_joueur_l , cul_joueur_h)))
     
-    pygame.draw.circle(fenetre, NOIR, joueur2_position, joueur_rayon)
+    pygame.draw.circle(fenetre, noir, joueur2_position, joueur_rayon)
     
-    pygame.draw.circle(fenetre, NOIR, balle_position, BALLE_RAYON)
-    pygame.draw.circle(fenetre, BLANC, balle_position, BALLE_RAYON-5)
+    pygame.draw.circle(fenetre, noir, (int(balle_position[H]), int(balle_position[V])), balle_rayon)
+    pygame.draw.circle(fenetre, blanc, (int(balle_position[H]), int(balle_position[V])), balle_rayon-5)
     #--- Dessin sol
-    pygame.draw.rect(fenetre, BLANC, (sol2_position, (1500, 200)))
-    pygame.draw.rect(fenetre, NOIR, (sol_position, (1500, 200)))
+    pygame.draw.rect(fenetre, blanc, (sol2_position, (1500, 200)))
+    pygame.draw.rect(fenetre, noir, (sol_position, (1500, 200)))
 
 
-    #--- Afficher (rafraîchir) l'écran
+    #--- Afficher (rafraichir) l ecran
     pygame.display.flip()
 
-    #--- 50 images par seconde
-    temps.tick(100)
+    #--- 60 images par seconde
+    temps.tick(60)
 
 pygame.display.quit()
 pygame.quit()
