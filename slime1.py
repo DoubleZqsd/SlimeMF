@@ -35,8 +35,8 @@ sol_position = [0, fenetre_h - 50]
 sol2_position = [0, fenetre_h - 53]
 joueur1pos = [ 150 , fenetre_h - 53]
 joueur2pos = [ fenetre_l - 150 , fenetre_h - 53]
-joueur1_vitesse = [10.0 , 0.0]
-joueur2_vitesse = [10.0 , 0.0]
+joueur1_vitesse = [5.0 , 0.0]
+joueur2_vitesse = [5.0 , 0.0]
 
 #---Variables
 reduc_vitesse=8
@@ -63,13 +63,13 @@ def deplace_h_joueur1(sens):
 def deplace_v_joueur2(sens):       
                global air2
                if not air2 :
-                  joueur2_vitesse[V] -= 15.0 
+                  joueur2_vitesse[V] -= 10.0 
                   air2 = True
       
 def deplace_v_joueur1(sens):       
                global air1
                if not air1 :
-                  joueur1_vitesse[V] -= 15.0 
+                  joueur1_vitesse[V] -= 10.0 
                   air1 = True
 
 #---Touches Clavier
@@ -134,12 +134,12 @@ joueur2 = pygame.transform.scale(joueur2,(120,60))
 ##############
 
 gc = nouvelleGestionClavier()
-repeteTouche(gc, pygame.K_q, 100, 25)
-repeteTouche(gc, pygame.K_z, 100, 25)
-repeteTouche(gc, pygame.K_d, 100, 25)
-repeteTouche(gc, pygame.K_LEFT, 100, 25)
-repeteTouche(gc, pygame.K_RIGHT, 100, 25)
-repeteTouche(gc, pygame.K_UP, 100, 25)
+repeteTouche(gc, pygame.K_q, 25, 5)
+repeteTouche(gc, pygame.K_z, 25, 5)
+repeteTouche(gc, pygame.K_d, 25, 5)
+repeteTouche(gc, pygame.K_LEFT, 25, 5)
+repeteTouche(gc, pygame.K_RIGHT, 25, 25)
+repeteTouche(gc, pygame.K_UP, 25, 25)
 
 
 #--- Boucle principale
