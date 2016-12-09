@@ -25,7 +25,6 @@ balle_rayon = 30
 joueur_rayon = 60.0
 score1 = 0
 score2 = 0 
-separation = '-'
 #---Position elements
 ballepos = [640.0, 50.0]
 balle_vitesse  = [2.0, 4.0]
@@ -42,19 +41,26 @@ fini = False
 air1 = False
 air2 = False
 pause = False
+menu = True
 lastballpos = [0.0 , 0.0] 
 
 #DEFINITIONS
 
-def menu():
-    global fini 
-    menu = True
+def menu_intro():
+    global menu 
     while menu :
           for evenement in pygame.event.get():
               if evenement.type == pygame.QUIT:
                  pygame.quit()
+              if evenement.type == pygame.KEYDOWN:
+                 if evenement.key == pygame.K_y:
+                    menu = False
           fenetre.fill(noir)
-         
+          police = pygame.font.SysFont('Arial', fenetre_h//12, True)
+          titre = police.render("SLIME SOCCER" , True, blanc )
+          fenetre.blit(titre,(680 , 90))
+          pygame.display.flip()
+              
 def deplace_h_joueur2(sens):
        joueur2pos[H] += joueur2_vitesse[H]* sens
        if joueur2pos[H] >= fenetre_l - joueur_rayon*2 :
@@ -80,14 +86,11 @@ def deplace_v_joueur1(sens):
                   air1 = True
 def score():
    global score1
-   global scoreone
    global score2  
-   global scoretwo
-   global separation
    police = pygame.font.SysFont('Arial', fenetre_h//12, True)
-   scoreone = police.render(str(score1) , True, noir )
-   scoretwo = police.render(str(score2) , True, noir )
-   separation = police.render("-", True, noir)
+   scores = police.render(str(score1) + " - " + str(score2) , True, noir )
+   fenetre.blit(scores,(640,90))
+   pygame.display.flip()
    
 
 #---Touches Clavier
@@ -204,13 +207,12 @@ repeteTouche(gc, pygame.K_UP, 0, 0)
 
 #--- Boucle principale
 while not fini:
-    
+    menu_intro()
     entrees()
-    #menu()
-    score()
+    
     if pause : 
        pause = time.time()
-    elif not pause :
+    elif not pause and not menu:
        pause = False
         #--- Gravity
         #---Derniere position balle
@@ -226,7 +228,9 @@ while not fini:
     
        joueur1pos[V] += (joueur1_vitesse[V]*(1.0/60.0) + ((8.0 * (1.0/60.0*1.0/60.0))/2.0))*100.0
        joueur1_vitesse[V] += 8.00* (1.0/60.0)
-    
+       
+       
+       
     #---Calculons Pythagore
     #---Variables pyt
        x1 = joueur1pos[H]-ballepos[H]
@@ -319,14 +323,12 @@ while not fini:
        fenetre.blit(joueur2, joueur2pos)
        fenetre.blit(goal1 , (0,sol2_position[V]-220))
        fenetre.blit(goal2 , (fenetre_l-160,sol2_position[V]-220))
-       fenetre.blit(scoreone,(580 , 90))
-       fenetre.blit(scoretwo,(680 , 90))
-       fenetre.blit(separation,(640,90))
+       
     
     #--- Dessin sol    
        pygame.draw.rect(fenetre, blanc, (sol2_position, (1500, 200)))
        pygame.draw.rect(fenetre, noir, (sol_position, (1500, 200)))
-
+       score()
     #--- Afficher (rafraichir) l cran
     pygame.display.flip()
     
