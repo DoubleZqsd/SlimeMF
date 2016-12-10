@@ -104,8 +104,6 @@ def deplace_v_joueur1(sens):
 def score():
    global score1
    global score2  
-   m = pygame.mouse.get_pos()
-   print(str(m))
    pygame.draw.rect(fenetre, noir, ((500,60),(275,115)))
    pygame.draw.rect(fenetre, blanc, ((515,75),(245,85)))
    police = pygame.font.SysFont('Arial', 60, True)
