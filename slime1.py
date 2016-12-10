@@ -15,7 +15,7 @@ GAUCHE = -1
 blanc  = ( 255, 255, 255)
 noir   = (0, 0, 0)
 red = ( 255 , 0 , 0 )
-
+bleu =  (  0,   0, 255)
 #---Taille fenetre
 fenetre_l = 1280
 fenetre_h = 720
@@ -23,15 +23,15 @@ fenetre_h = 720
 #---Taille elements
 balle_rayon = 30
 joueur_rayon = 60.0
-score1 = 0
-score2 = 0 
+score1 =0
+score2 =0 
 #---Position elements
-ballepos = [640.0, 50.0]
-balle_vitesse  = [2.0, 4.0]
+ballepos = [640.0, 360.0]
+balle_vitesse  = [0.0, 4.0]
 sol_position = [0, fenetre_h - 50]
 sol2_position = [0, fenetre_h - 53]
-joueur1pos = [ 150 , fenetre_h - 53]
-joueur2pos = [ fenetre_l - 150 , fenetre_h - 53]
+joueur1pos = [ 180 , fenetre_h - 53]
+joueur2pos = [ fenetre_l - 300 , fenetre_h - 53]
 joueur1_vitesse = [10.0 , 0.0]
 joueur2_vitesse = [10.0 , 0.0]
 
@@ -55,10 +55,27 @@ def menu_intro():
               if evenement.type == pygame.KEYDOWN:
                  if evenement.key == pygame.K_y:
                     menu = False
-          fenetre.fill(noir)
-          police = pygame.font.SysFont('Arial', fenetre_h//12, True)
-          titre = police.render("SLIME SOCCER" , True, blanc )
-          fenetre.blit(titre,(680 , 90))
+          fenetre.fill(blanc)
+          m = pygame.mouse.get_pos()
+          click = pygame.mouse.get_pressed()
+          if 550>= m[0] >= 520 and 375 >= m[1] >= 345 or 580>= m[0]>=550 and 390 >= m[1] >= 330 or 610 >= m[0] >= 580 and 405 >= m[1]>315 or 670 >= m[0] >= 610 and 420 >= m[1] >=300 :
+             fenetre.blit(joueur1, (joueur1pos[H] ,joueur1pos[V]-60.0))
+             fenetre.blit(joueur2, (joueur2pos[H] , joueur2pos[V]-60.0))
+             fenetre.blit(goal1 , (0,sol2_position[V]-220))
+             fenetre.blit(goal2 , (fenetre_l-160,sol2_position[V]-220))
+             pygame.draw.circle(fenetre, noir, (640,360), 30)
+             if click[0] == 1 :
+                menu = False
+          else :
+               logo = pygame.image.load('logo.png').convert_alpha(fenetre)
+               logo = pygame.transform.scale(logo,(120,120))
+               fenetre.blit(logo,(580,300))
+          
+          titrejeu = pygame.image.load('titre.png').convert_alpha(fenetre)
+          titrejeu = pygame.transform.scale(titrejeu,(500,230))
+          fenetre.blit(titrejeu,(390,50))
+          pygame.draw.rect(fenetre, noir, (sol_position, (1500, 200)))
+          #pygame.draw.circle(fenetre, noir, (int(ballepos[H]), int(ballepos[V])), balle_rayon)
           pygame.display.flip()
               
 def deplace_h_joueur2(sens):
@@ -87,9 +104,14 @@ def deplace_v_joueur1(sens):
 def score():
    global score1
    global score2  
-   police = pygame.font.SysFont('Arial', fenetre_h//12, True)
-   scores = police.render(str(score1) + " - " + str(score2) , True, noir )
-   fenetre.blit(scores,(640,90))
+   m = pygame.mouse.get_pos()
+   print(str(m))
+   pygame.draw.rect(fenetre, noir, ((500,60),(275,115)))
+   pygame.draw.rect(fenetre, blanc, ((515,75),(245,85)))
+   police = pygame.font.SysFont('Arial', 60, True)
+   scores = police.render(str(score1) + "   -   " + str(score2) , True, noir )
+
+   fenetre.blit(scores,(545,85))
    pygame.display.flip()
    
 
@@ -164,7 +186,6 @@ def entrees():
                deplace_v_joueur1(DROITE)
             if evenement.key ==pygame.K_TAB :
                pause = not pause
-               print(str(pause))
         if evenement.type == pygame.KEYPRESSED:
             if evenement.key == pygame.K_RIGHT :
                deplace_h_joueur2(DROITE)
@@ -177,7 +198,7 @@ def entrees():
             if evenement.key ==pygame.K_UP :
                deplace_v_joueur2(DROITE)
             if evenement.key ==pygame.K_z :
-               deplace_v_joueur1(DROITE)      
+               deplace_v_joueur1(DROITE)
 #----------PYGAME INIT--------------
 pygame.init()
 ##############
@@ -207,8 +228,9 @@ repeteTouche(gc, pygame.K_UP, 0, 0)
 
 #--- Boucle principale
 while not fini:
-    menu_intro()
+
     entrees()
+    menu_intro()
     
     if pause : 
        pause = time.time()
