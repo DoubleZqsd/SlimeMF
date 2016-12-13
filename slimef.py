@@ -34,6 +34,8 @@ sol2_position = [0.0, fenetre_h - 53.0]
 joueur1pos = [ 560.0 , fenetre_h - 53.0]
 joueur2pos = [ fenetre_l - 150.0 , fenetre_h - 53.0]
 joueur1_vitesse = [10.0 , 0.0]
+jou1vit = [ 0.0 , 0.0]
+jou2vit = [ 0.0 , 0.0]
 joueur2_vitesse = [10.0 , 0.0]
 j1pos = [0.0 , 0.0]
 j2pos = [0.0 , 0.0]
@@ -153,12 +155,16 @@ def entrees():
         if evenement.type == pygame.KEYDOWN:
             if evenement.key == pygame.K_RIGHT :
                deplace_h_joueur2(DROITE)
+               jou2vit[H] = 15.0
             if evenement.key ==pygame.K_LEFT:
                deplace_h_joueur2(GAUCHE)
+               jou2vit[H] = -15.0
             if evenement.key ==pygame.K_d:
-               deplace_h_joueur1(DROITE)             
+               deplace_h_joueur1(DROITE)
+               jou1vit[H] = 15.0             
             if evenement.key ==pygame.K_q:
-               deplace_h_joueur1(GAUCHE)                
+               deplace_h_joueur1(GAUCHE)
+               jou1vit[H] = -15.0                
             if evenement.key ==pygame.K_UP :
                deplace_v_joueur2(DROITE)
             if evenement.key ==pygame.K_z :
@@ -178,7 +184,19 @@ def entrees():
             if evenement.key ==pygame.K_UP :
                deplace_v_joueur2(DROITE)
             if evenement.key ==pygame.K_z :
-               deplace_v_joueur1(DROITE)      
+               deplace_v_joueur1(DROITE)  
+        if evenement.type == pygame.KEYUP:
+            if evenement.key == pygame.K_RIGHT:
+               jou2vit[H] = 0
+            if evenement.key == pygame.K_LEFT:
+               jou2vit[H] = 0
+            if evenement.key == pygame.K_d:
+               jou1vit[H] = 0
+            if evenement.key == pygame.K_q:
+               jou1vit[H] = 0
+
+
+
                
                
 #---Fonction collision joueurs
@@ -191,7 +209,7 @@ def collisionJoueur(x1pos , y1pos):
    
    
    #---Calcul Alpha (vecteur arrivee balle - sol)
-   ax = ballepos[H] - lastballpos[H] - joueur1_vitesse[H] #--Composante X vecteur arrivee balle
+   ax = ballepos[H] - lastballpos[H] - jou1vit[H] #--Composante X vecteur arrivee balle
    #ax= balle_vitesse[H]
                    
    ay = ballepos[V] - lastballpos[V] - joueur1_vitesse[V]#--Composante Y vecteur arrivee balle
@@ -235,7 +253,7 @@ def collisionJoueur(x1pos , y1pos):
                    
          balle_vitesse[V] = ry + joueur1_vitesse[V]
 
-         balle_vitesse[H] = rx + joueur1_vitesse[H]
+         balle_vitesse[H] = rx + jou1vit[H]
                    
          #---Regain energie balle
          reduc_vitesse = 8
