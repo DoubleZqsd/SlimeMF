@@ -49,14 +49,16 @@ pause = False
 menu = True
 j1col = False
 j2col = False
+son = True
 
 
 #DEFINITIONS
 
-    
 
 def menu_intro():
     global menu 
+    if son :
+       pygame.mixer.music.play(-1)
     while menu :
           fenetre.fill(blanc)
           m = pygame.mouse.get_pos()
@@ -87,8 +89,10 @@ def menu_intro():
           pygame.display.flip()
           
 def menu_pause() : 
-    global pause , menu , fini , joueur1pos , joueur2pos , ballepos , joueur1_vitesse , joueur2_vitesse , balle_vitesse , score1 , score2
+    global pause , menu , fini , joueur1pos , joueur2pos , ballepos , joueur1_vitesse , joueur2_vitesse , balle_vitesse , score1 , score2 , son
     fenetre.fill(blanc)
+    if son :
+       pygame.mixer.music.play(-1)
     while pause :
           pause = time.time()
           mouse = pygame.mouse.get_pos()
@@ -100,10 +104,14 @@ def menu_pause() :
              fenetre.blit(recommencer2,(435,325))
           else :
              fenetre.blit(recommencer,(435,325))
-          if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 400 and mouse[1]<= 450 :
-             fenetre.blit(quitter2,(435,400))
+          if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 400 and mouse[1]<= 450 or son :
+             fenetre.blit(son2,(435,400))
+          elif mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 400 and mouse[1]<= 450 or not son :
+             fenetre.blit(son3,(435,400))
+          if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 475 and mouse[1]<= 525 :
+             fenetre.blit(quitter2,(435,475))
           else :
-             fenetre.blit(quitter,(435,400))
+             fenetre.blit(quitter,(435,475))
           for evenement in pygame.event.get():
               if evenement.type == pygame.QUIT:
                  pygame.quit()
@@ -125,10 +133,18 @@ def menu_pause() :
                        score2 = 0
                        menu = True
                        pause = False
-                 if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 400 and mouse[1]<= 450 :
+                 if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 475 and mouse[1]<= 525 :
                     if evenement.button == BOUTON_SOURIS_GAUCHE:
                        fini = True
                        pause = False
+                 if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 400 and mouse[1]<= 450 :
+                    if evenement.button == BOUTON_SOURIS_GAUCHE:
+                       son = not son
+                       if not son :
+                          pygame.mixer.music.pause()
+                       if son :
+                          pygame.mixer.music.play(-1)
+                          pygame.mixer.music.unpause()
           logo2 = pygame.transform.scale(logo ,(150,150))
           fenetre.blit(logo2,(565,50))
           pygame.draw.rect(fenetre, noir, (sol_position, (1500, 200)))
@@ -239,14 +255,12 @@ def collisionJoueur(x1pos , y1pos, numjoueur):
          reduc_vitesse = 8
 
 def score():
-   global score1
-   global score2  
+   global score1 , score2 , ballepos , balle_vitesse , joueur1pos , joueur2pos , joueur1_vitesse , joueur2_vitesse 
    pygame.draw.rect(fenetre, noir, ((500,60),(275,115)))
    pygame.draw.rect(fenetre, blanc, ((515,75),(245,85)))
    police = pygame.font.SysFont('Arial', 60, True)
    scores = police.render(str(score1) + "   -   " + str(score2) , True, noir )
-
-   fenetre.blit(scores,(545,85))
+   fenetre.blit(scores,(542,85))
    pygame.display.flip()
    
 
@@ -387,12 +401,18 @@ quitter = pygame.transform.scale(quitter,(400,50))
 quitter2 = pygame.image.load('Quitter2.png').convert_alpha(fenetre)
 quitter2 = pygame.transform.scale(quitter2,(400,50))
 
-son = pygame.image.load('Son.png').convert_alpha(fenetre)
-son = pygame.transform.scale(son,(400,50))
+son3 = pygame.image.load('Son.png').convert_alpha(fenetre)
+son3 = pygame.transform.scale(son3,(400,50))
 son2 = pygame.image.load('Son2.png').convert_alpha(fenetre)
 son2 = pygame.transform.scale(son2,(400,50))
 
+message = pygame.image.load('message.png').convert_alpha(fenetre)
+message = pygame.transform.scale(message,(300,130))
 
+mur = pygame.mixer.Sound("mur.wav")
+balj = pygame.mixer.Sound("joueur.wav")
+man = pygame.mixer.Sound("goal.wav")
+musique = pygame.mixer.music.load("musique.wav")
 
 ##############
 
@@ -407,10 +427,13 @@ repeteTouche(gc, pygame.K_UP, 0, 0)
 
 #--- Boucle principale
 while not fini:
+    
     menu_pause()
     menu_intro()
+
     if not pause and not menu:
        entrees()
+       pygame.mixer.music.stop()
          #--- Gravity
         #---Derniere position balle
        lastballpos[H] = ballepos [H]
@@ -451,6 +474,8 @@ while not fini:
        #---Collision balle - joueur1    
        if pyt1 <= 90.0 and j1col == False:
           j1col = True
+          if son :
+             pygame.mixer.Sound.play(balj)
           #appel fonction collisionJoueur pour le joueur 1
           collisionJoueur(x1pos, y1pos, 1)                       
        elif pyt1 > 90.0:
@@ -459,6 +484,8 @@ while not fini:
        #---Collision balle - joueur 2   
        if pyt2 <= 90.0 and j2col == False:
           j2col = True
+          if son :
+             pygame.mixer.Sound.play(balj)
           #appel fonction collisionJoueur pour le joueur 2
           collisionJoueur(x2pos, y2pos, 2)                 
        elif pyt2>90.0:
@@ -472,11 +499,15 @@ while not fini:
        if ballepos[H] + balle_rayon >= fenetre_l:
           ballepos[H] = fenetre_l - balle_rayon
           balle_vitesse[H] = -balle_vitesse[H] * 0.8
+          if son :
+             pygame.mixer.Sound.play(mur)
     #---Collision balle - fenetre GAUCHE
        else:
           if ballepos[H] < balle_rayon:
              ballepos[H] = balle_rayon
              balle_vitesse[H] = -balle_vitesse[H] * 0.8
+             if son :
+                pygame.mixer.Sound.play(mur)
     #---Collision balle - fenetre BAS
           if ballepos[V] + balle_rayon >= sol2_position[1]:
              ballepos[V] = sol2_position[1] - balle_rayon
@@ -499,38 +530,12 @@ while not fini:
        
        if ballepos[V] < balle_rayon:
           ballepos[V] = balle_rayon
-          balle_vitesse[V] = -balle_vitesse[V] * 0.8   
-
-    #---Collision dessus goal 1
-       if ballepos[V] > 450 and ballepos[V] < 480 and ballepos[H] < 130:
-          ballepos[V] = 452
-          balle_vitesse[V] = -balle_vitesse[V] * reduc_vitesse/10
-          reduc_vitesse -= 1
-          if reduc_vitesse < 0:
-             reduc_vitesse = 0
-    #---Balle dans le Goal 1
-       if ballepos[V] >= 470 and ballepos[H] <= 130:
-          score2 += 1
-          ballepos=[640.0, 50.0]
-          balle_vitesse=[0.0 , 0.0]
-          joueur1pos = [ 180 , fenetre_h - 113]
-          joueur2pos = [ fenetre_l - 300 , fenetre_h - 113]
-          joueur1_vitesse = [10.0 , 0.0]
-          joueur2_vitesse = [10.0 , 0.0]
-          message = pygame.image.load('message.png').convert_alpha(fenetre)
-          message = pygame.transform.scale(message,(300,130))
-          fenetre.blit(message,(545,210))
-          time.sleep(2)
-
-    #---Collision dessus goal 2
-       if ballepos[V] > 450 and ballepos[V] < 480 and ballepos[H] > fenetre_l - 130 :
-          ballepos[V] = 452
-          balle_vitesse[V] = -balle_vitesse[V] * reduc_vitesse/10
-          reduc_vitesse -= 1
-          if reduc_vitesse < 0:
-             reduc_vitesse = 0
+          balle_vitesse[V] = -balle_vitesse[V] * 0.8
+          if son :
+             pygame.mixer.Sound.play(mur)   
+    
     #---Balle dans le goal 2
-       if ballepos[V] >= 470 and ballepos[H] >= fenetre_l - 130:
+       if ballepos[V] >= 470 and ballepos[H] >= fenetre_l - 85:
           score1 += 1
           ballepos=[640.0, 50.0]
           balle_vitesse=[0.0 , 0.0]
@@ -538,18 +543,48 @@ while not fini:
           joueur2pos = [ fenetre_l - 300 , fenetre_h - 113]
           joueur1_vitesse = [10.0 , 0.0]
           joueur2_vitesse = [10.0 , 0.0]
-          message = pygame.image.load('message.png').convert_alpha(fenetre)
-          message = pygame.transform.scale(message,(300,130))
-          fenetre.blit(message,(545,210))
-          time.sleep(2)
+          fenetre.blit(message,(535,310))
+          if son : 
+             pygame.mixer.Sound(man)
+          time.sleep(1)
+    #---Balle dans le Goal 1
+       if ballepos[V] >= 470 and ballepos[H] <= 85:
+          score2 += 1
+          ballepos=[640.0, 50.0]
+          balle_vitesse=[0.0 , 0.0]
+          joueur1pos = [ 180 , fenetre_h - 113]
+          joueur2pos = [ fenetre_l - 300 , fenetre_h - 113]
+          joueur1_vitesse = [10.0 , 0.0]
+          joueur2_vitesse = [10.0 , 0.0]
+          
+          fenetre.blit(message,(535,310))
+          if son : 
+             pygame.mixer.Sound(man)
+          time.sleep(1)
+
+
+    #---Collision dessus goal 1
+       if ballepos[V] > 440 and ballepos[V] < 480 and ballepos[H] < 140:
+          ballepos[V] = 452
+          balle_vitesse[V] = -balle_vitesse[V] * reduc_vitesse/10
+          reduc_vitesse -= 1
+          if reduc_vitesse < 0:
+             reduc_vitesse = 0
+
+
+    #---Collision dessus goal 2
+       if ballepos[V] > 440 and ballepos[V] < 480 and ballepos[H] > fenetre_l - 140 :
+          ballepos[V] = 452
+          balle_vitesse[V] = -balle_vitesse[V] * reduc_vitesse/10
+          reduc_vitesse -= 1
+          if reduc_vitesse < 0:
+             reduc_vitesse = 0
           
     
     
     #---Dessin a chaque tour (60/sec)
     #---Dessin l ecran
        fenetre.fill(blanc)
-    #--- Messages
-
     #---Dessin balle
        pygame.draw.circle(fenetre, noir, (int(ballepos[H]), int(ballepos[V])), balle_rayon)
        pygame.draw.circle(fenetre, blanc, (int(ballepos[H]), int(ballepos[V])), balle_rayon-5)
