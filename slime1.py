@@ -10,6 +10,7 @@ pygame.KEYPRESSED = pygame.USEREVENT
 #---Variables qui serviront a determiner le sens dans laquelle le joueur se deplace.
 DROITE = 1
 GAUCHE = -1
+BOUTON_SOURIS_GAUCHE = 1
 
 #---Couleurs
 blanc  = ( 255, 255, 255)
@@ -27,14 +28,18 @@ score1 =0
 score2 =0 
 #---Position elements
 ballepos = [640.0, 360.0]
-balle_vitesse  = [0.0, 4.0]
 sol_position = [0, fenetre_h - 50]
 sol2_position = [0, fenetre_h - 53]
-joueur1pos = [ 180 , fenetre_h - 53]
-joueur2pos = [ fenetre_l - 300 , fenetre_h - 53]
+joueur1pos = [ 180 , fenetre_h - 113]
+joueur2pos = [ fenetre_l - 300 , fenetre_h - 113]
 joueur1_vitesse = [10.0 , 0.0]
 joueur2_vitesse = [10.0 , 0.0]
-
+balle_vitesse  = [0.0, 4.0]
+lastballpos = [0.0 , 0.0] 
+j1pos = [0.0 , 0.0]
+j2pos = [0.0 , 0.0]
+jou1vit = [ 0.0 , 0.0]
+jou2vit = [ 0.0 , 0.0]
 #---Variables
 reduc_vitesse=8
 fini = False
@@ -42,42 +47,100 @@ air1 = False
 air2 = False
 pause = False
 menu = True
-lastballpos = [0.0 , 0.0] 
+j1col = False
+j2col = False
+
 
 #DEFINITIONS
+
+    
 
 def menu_intro():
     global menu 
     while menu :
+          fenetre.fill(blanc)
+          m = pygame.mouse.get_pos()
+          if 580>= m[0]>=550 and 390 >= m[1] >= 350 or 610 >= m[0] >= 580 and 405 >= m[1]>315 or 670 >= m[0] >= 610 and 420 >= m[1] >=300 or 700 >= m[0] >= 670 and 400 >= m[1] >= 315  :
+                   fenetre.blit(joueur1, (joueur1pos[H] ,joueur1pos[V]))
+                   fenetre.blit(joueur2, (joueur2pos[H] , joueur2pos[V]))
+                   fenetre.blit(goal1 , (0,sol2_position[V]-220))
+                   fenetre.blit(goal2 , (fenetre_l-160,sol2_position[V]-220))
+                   pygame.draw.circle(fenetre, noir, (640,360), 30)
+          else :
+                   fenetre.blit(logo,(580,300))
           for evenement in pygame.event.get():
               if evenement.type == pygame.QUIT:
                  pygame.quit()
-              if evenement.type == pygame.KEYDOWN:
-                 if evenement.key == pygame.K_y:
-                    menu = False
-          fenetre.fill(blanc)
-          m = pygame.mouse.get_pos()
-          click = pygame.mouse.get_pressed()
-          if 550>= m[0] >= 520 and 375 >= m[1] >= 345 or 580>= m[0]>=550 and 390 >= m[1] >= 330 or 610 >= m[0] >= 580 and 405 >= m[1]>315 or 670 >= m[0] >= 610 and 420 >= m[1] >=300 :
-             fenetre.blit(joueur1, (joueur1pos[H] ,joueur1pos[V]-60.0))
-             fenetre.blit(joueur2, (joueur2pos[H] , joueur2pos[V]-60.0))
-             fenetre.blit(goal1 , (0,sol2_position[V]-220))
-             fenetre.blit(goal2 , (fenetre_l-160,sol2_position[V]-220))
-             pygame.draw.circle(fenetre, noir, (640,360), 30)
-             if click[0] == 1 :
-                menu = False
-          else :
-               logo = pygame.image.load('logo.png').convert_alpha(fenetre)
-               logo = pygame.transform.scale(logo,(120,120))
-               fenetre.blit(logo,(580,300))
+              if evenement.type == pygame.MOUSEBUTTONDOWN:
+                 m = evenement.pos   
+                 if 580>= m[0]>=550 and 390 >= m[1] >= 350 or 610 >= m[0] >= 580 and 405 >= m[1]>315 or 670 >= m[0] >= 610 and 420 >= m[1] >=300 or 700 >= m[0] >= 670 and 400 >= m[1] >= 315  :
+                    if evenement.button == BOUTON_SOURIS_GAUCHE : 
+                       menu = False
+                    
+          
+
           
           titrejeu = pygame.image.load('titre.png').convert_alpha(fenetre)
           titrejeu = pygame.transform.scale(titrejeu,(500,230))
           fenetre.blit(titrejeu,(390,50))
           pygame.draw.rect(fenetre, noir, (sol_position, (1500, 200)))
-          #pygame.draw.circle(fenetre, noir, (int(ballepos[H]), int(ballepos[V])), balle_rayon)
           pygame.display.flip()
-              
+          
+def menu_pause() : 
+    global pause , menu , fini , joueur1pos , joueur2pos , ballepos , joueur1_vitesse , joueur2_vitesse , balle_vitesse , score1 , score2
+    fenetre.fill(blanc)
+    while pause :
+          pause = time.time()
+          mouse = pygame.mouse.get_pos()
+          if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 250 and mouse[1]<= 300 :
+             fenetre.blit(reprendre2,(435,250))
+          else :
+             fenetre.blit(reprendre,(435,250))
+          if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 325 and mouse[1]<= 375 :
+             fenetre.blit(recommencer2,(435,325))
+          else :
+             fenetre.blit(recommencer,(435,325))
+          if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 400 and mouse[1]<= 450 :
+             fenetre.blit(quitter2,(435,400))
+          else :
+             fenetre.blit(quitter,(435,400))
+          for evenement in pygame.event.get():
+              if evenement.type == pygame.QUIT:
+                 pygame.quit()
+              if evenement.type == pygame.MOUSEBUTTONDOWN:
+                 mouse = evenement.pos   
+                 if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 250 and mouse[1]<= 300 :
+                    if evenement.button == BOUTON_SOURIS_GAUCHE :
+                       pause = False
+
+                 if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 325 and mouse[1]<= 375 :
+                    if evenement.button == BOUTON_SOURIS_GAUCHE :
+                       joueur1pos = [ 180 , fenetre_h - 113]
+                       joueur2pos = [ fenetre_l - 300 , fenetre_h - 113]
+                       ballepos = [640.0, 360.0]
+                       joueur1_vitesse = [10.0 , 0.0]
+                       joueur2_vitesse = [10.0 , 0.0]
+                       balle_vitesse  = [0.0, 0.0]
+                       score1 = 0
+                       score2 = 0
+                       menu = True
+                       pause = False
+                 if mouse[0] >= 435 and mouse[0]<=835 and mouse[1] >= 400 and mouse[1]<= 450 :
+                    if evenement.button == BOUTON_SOURIS_GAUCHE:
+                       fini = True
+                       pause = False
+          logo2 = pygame.transform.scale(logo ,(150,150))
+          fenetre.blit(logo2,(565,50))
+          pygame.draw.rect(fenetre, noir, (sol_position, (1500, 200)))
+
+          pygame.display.flip()  
+    
+          
+          
+          
+          
+          
+          
 def deplace_h_joueur2(sens):
        joueur2pos[H] += joueur2_vitesse[H]* sens
        if joueur2pos[H] >= fenetre_l - joueur_rayon*2 :
@@ -101,6 +164,80 @@ def deplace_v_joueur1(sens):
                if not air1 :
                   joueur1_vitesse[V] -= 6.0 
                   air1 = True
+                  
+#---Fonction collision joueurs
+def collisionJoueur(x1pos , y1pos, numjoueur):
+   global H
+   global V
+   global balle_vitesse
+   global reduc_vitesse
+   global lastballpos
+   canDo = False
+   
+   
+   #---Calcul Alpha (vecteur arrivee balle - sol)
+   if numjoueur == 1:
+      ax = ballepos[H] - lastballpos[H] - jou1vit[H] #--Composante X vecteur arrivee balle
+      ay = ballepos[V] - lastballpos[V] - joueur1_vitesse[V]#--Composante Y vecteur arrivee balle
+      air = air1
+   elif numjoueur == 2:
+      ax = ballepos[H] - lastballpos[H] - jou2vit[H]
+      ay = ballepos[V] - lastballpos[V] - joueur2_vitesse[V]
+      air = air2
+
+   if ay < 0 and air == False:
+      #rebond sur plat dessous joueur
+      if numjoueur == 1:
+         balle_vitesse[V] = -balle_vitesse[V] + 2* joueur1_vitesse[V]
+      elif numjoueur == 2:
+         balle_vitesse[V] = -balle_vitesse[V] + 2* joueur2_vitesse[V]
+          
+   else:
+      #if abs(x1pos) < 1e-4 :
+       #  #collision sur plat dessus joueur
+        # balle_vitesse[V] = -balle_vitesse[V] * 0.8
+             
+      
+         #collision sur le cote 
+         #---Calcul Theta (droite centre joueur et balle - sol)
+         theta = math.atan2(y1pos,-x1pos)
+
+
+         alpha = math.atan2( ay,-ax )
+
+         #---Calcul gamma (angle arrivee balle - perpendiculaire tangente point de collision)
+         gamma = alpha - theta
+
+         #---Calcul beta (angle rebond balle - sol)
+         beta = alpha - 2 * gamma
+
+         #---Calcul vecteur arrivee balle
+         va = math.sqrt( (ax*ax) + (ay*ay)) * 0.8
+         print('va: ' + str(va))
+         if va < 0.15:
+            va = 25.0
+         #---Decomposition X Y du vecteur rebond balle
+         rx = math.cos(beta) * va
+
+         ry = -math.sin(beta) * va
+
+         #---Application du vecteur rebond a la balle
+         if numjoueur == 1:         
+            balle_vitesse[V] = (ry + joueur1_vitesse[V] - 0.13333) * 0.8
+            balle_vitesse[H] = rx + jou1vit[H]
+            print('rebond joueur1')
+            print('vitesse H: ' + str(jou1vit[H]) + ' et V: ' + str(joueur1_vitesse[V]))
+
+         elif numjoueur == 2:
+            balle_vitesse[V] = (ry + joueur2_vitesse[V] - 0.13333) * 0.8
+            balle_vitesse[H] = rx + jou2vit[H]
+            print('rebond joueur2')
+            print('vitesse H: ' + str(jou2vit[H]) + ' et V: ' + str(joueur2_vitesse[V]))
+         
+                   
+         #---Regain energie balle
+         reduc_vitesse = 8
+
 def score():
    global score1
    global score2  
@@ -172,12 +309,16 @@ def entrees():
         if evenement.type == pygame.KEYDOWN:
             if evenement.key == pygame.K_RIGHT :
                deplace_h_joueur2(DROITE)
+               jou2vit[H] = 10.0
             if evenement.key ==pygame.K_LEFT:
                deplace_h_joueur2(GAUCHE)
+               jou2vit[H] = -10.0
             if evenement.key ==pygame.K_d:
-               deplace_h_joueur1(DROITE)             
+               deplace_h_joueur1(DROITE)
+               jou1vit[H] = 10.0             
             if evenement.key ==pygame.K_q:
-               deplace_h_joueur1(GAUCHE)                
+               deplace_h_joueur1(GAUCHE)
+               jou1vit[H] = -10.0                        
             if evenement.key ==pygame.K_UP :
                deplace_v_joueur2(DROITE)
             if evenement.key ==pygame.K_z :
@@ -197,6 +338,19 @@ def entrees():
                deplace_v_joueur2(DROITE)
             if evenement.key ==pygame.K_z :
                deplace_v_joueur1(DROITE)
+        if evenement.type == pygame.KEYUP:
+            if evenement.key == pygame.K_RIGHT:
+               jou2vit[H] = 0
+            if evenement.key == pygame.K_LEFT:
+               jou2vit[H] = 0
+            if evenement.key == pygame.K_d:
+               jou1vit[H] = 0
+            if evenement.key == pygame.K_q:
+               jou1vit[H] = 0
+             
+             
+             
+
 #----------PYGAME INIT--------------
 pygame.init()
 ##############
@@ -209,10 +363,37 @@ joueur1 = pygame.image.load('joueur1.png').convert_alpha(fenetre)
 joueur1 = pygame.transform.scale(joueur1,(120,60))
 joueur2 = pygame.image.load('joueur2.png').convert_alpha(fenetre)
 joueur2 = pygame.transform.scale(joueur2,(120,60))
+
 goal1 = pygame.image.load('goal1.png').convert_alpha(fenetre)
 goal1 = pygame.transform.scale(goal1,(160,220))
 goal2 = pygame.image.load('goal2.png').convert_alpha(fenetre)
 goal2 = pygame.transform.scale(goal2,(160,220))
+
+logo = pygame.image.load('logo.png').convert_alpha(fenetre)
+logo = pygame.transform.scale(logo,(120,120))
+
+reprendre = pygame.image.load('reprendre.png').convert_alpha(fenetre)
+reprendre = pygame.transform.scale(reprendre,(400,50))
+reprendre2 = pygame.image.load('reprendre2.png').convert_alpha(fenetre)
+reprendre2 = pygame.transform.scale(reprendre2,(400,50))
+
+recommencer = pygame.image.load('Recommencer.png').convert_alpha(fenetre)
+recommencer = pygame.transform.scale(recommencer,(400,50))
+recommencer2 = pygame.image.load('Recommencer2.png').convert_alpha(fenetre)
+recommencer2 = pygame.transform.scale(recommencer2,(400,50))
+
+quitter = pygame.image.load('Quitter.png').convert_alpha(fenetre)
+quitter = pygame.transform.scale(quitter,(400,50))
+quitter2 = pygame.image.load('Quitter2.png').convert_alpha(fenetre)
+quitter2 = pygame.transform.scale(quitter2,(400,50))
+
+son = pygame.image.load('Son.png').convert_alpha(fenetre)
+son = pygame.transform.scale(son,(400,50))
+son2 = pygame.image.load('Son2.png').convert_alpha(fenetre)
+son2 = pygame.transform.scale(son2,(400,50))
+
+
+
 ##############
 
 gc = nouvelleGestionClavier()
@@ -226,93 +407,83 @@ repeteTouche(gc, pygame.K_UP, 0, 0)
 
 #--- Boucle principale
 while not fini:
-
-    entrees()
+    menu_pause()
     menu_intro()
-    
-    if pause : 
-       pause = time.time()
-    elif not pause and not menu:
-       pause = False
-        #--- Gravity
+    if not pause and not menu:
+       entrees()
+         #--- Gravity
         #---Derniere position balle
        lastballpos[H] = ballepos [H]
        lastballpos[V] = ballepos [V]
+       #print('lastballpos=' + str(lastballpos))
        #---Ball gravity
        ballepos[V] += (balle_vitesse[V]*(1.0/60.0) + ((9.81 * (1.0/60.0*1.0/60.0))/2.0))*100.0 #*100 car 100px = 1m
        balle_vitesse[V] += 9.81 * (1.0/60.0)
-       ballepos[H] += balle_vitesse[H] * reduc_vitesse
+       ballepos[H] += balle_vitesse[H] * reduc_vitesse/10
     
        joueur2pos[V] += (joueur2_vitesse[V]*(1.0/60.0) + ((8.0 * (1.0/60.0*1.0/60.0))/2.0))*100.0
        joueur2_vitesse[V] += 8.00* (1.0/60.0)
     
        joueur1pos[V] += (joueur1_vitesse[V]*(1.0/60.0) + ((8.0 * (1.0/60.0*1.0/60.0))/2.0))*100.0
        joueur1_vitesse[V] += 8.00* (1.0/60.0)
-       
-       
-       
-    #---Calculons Pythagore
-    #---Variables pyt
-       x1 = joueur1pos[H]-ballepos[H]
-       y1 = joueur1pos[V]-ballepos[V]
-
-       x2 = joueur2pos[H]-ballepos[H]
-       y2 = joueur2pos[V]-ballepos[V]
     
-    #---Distance entre balle et joueur1
-       pyt1 = math.sqrt( (x1*x1) + (y1*y1) )
-    #---Distance entre balle et joueur2
-       pyt2 = math.sqrt( (x2*x2) + (y2*y2) )
-    #---Collision balle - joueur1    
-       if pyt1 <= 90.0:
-        #reposition de la balle au point de collision
+   
+       #---Def pos joueurs au centre du cercle
+       j1pos[H] = joueur1pos[H]+60
+       j1pos[V] = joueur1pos[V]+60
+       
+       j2pos[H] = joueur2pos[H]+60
+       j2pos[V] = joueur2pos[V]+60
+        #---Calculons Pythagore
+       
+       #---Variables pyt
+       x1pos = j1pos[H]-ballepos[H]
+       y1pos = j1pos[V]-ballepos[V]
 
-        if x1 > 0: #collision a gauche
-            balle_vitesse[H] = -abs(balle_vitesse[H]) * abs(x1)/60 * reduc_vitesse/10 # +joueur1vitesse[H]
-            balle_vitesse[V] = -abs(balle_vitesse[V]) * abs(y1)/60 * reduc_vitesse/10 # +joueur1vitesse[V]
-        else:
-            if x1 < 0: #collision a droite
-                balle_vitesse[H] = abs(balle_vitesse[H]) * abs(x1)/60 * reduc_vitesse/10 # +joueur1vitesse[H]
-                balle_vitesse[V] = -abs(balle_vitesse[V]) * abs(y1)/60 * reduc_vitesse/10 # +joueur1vitesse[V]
-
-        #get the fuck out
-
-        
-    #---Collision balle - joueur2
-       if pyt2 <= 90.0:
-        #reposition de la balle au point de collision 
-
-        
-        if x2 > 0: #collision a gauche
-            balle_vitesse[H] = -abs(balle_vitesse[H]) * (abs(x2)/60) * reduc_vitesse/10 # +joueur2vitesse[H]
-            balle_vitesse[V] = -abs(balle_vitesse[V]) * (abs(y2)/60) * reduc_vitesse/10 # +joueur2vitesse[V]
-        else:
-            if x2 < 0: #collision a droite
-                balle_vitesse[H] = abs(balle_vitesse[H]) * (abs(x2)/60) * reduc_vitesse/10 # +joueur2vitesse[H]
-                balle_vitesse[V] = -abs(balle_vitesse[V]) * (abs(y2)/60) * reduc_vitesse/10 # +joueur2vitesse[V]
-
-
-        #get the fuck out
-
-        
+       x2pos = j2pos[H]-ballepos[H]
+       y2pos = j2pos[V]-ballepos[V]
+    
+       #---Distance entre balle et joueur1
+       pyt1 = math.sqrt( (x1pos*x1pos) + (y1pos*y1pos) )
+       #---Distance entre balle et joueur2
+       pyt2 = math.sqrt( (x2pos*x2pos) + (y2pos*y2pos) )
+       
+       #---Collision balle - joueur1    
+       if pyt1 <= 90.0 and j1col == False:
+          j1col = True
+          #appel fonction collisionJoueur pour le joueur 1
+          collisionJoueur(x1pos, y1pos, 1)                       
+       elif pyt1 > 90.0:
+          j1col = False
+          
+       #---Collision balle - joueur 2   
+       if pyt2 <= 90.0 and j2col == False:
+          j2col = True
+          #appel fonction collisionJoueur pour le joueur 2
+          collisionJoueur(x2pos, y2pos, 2)                 
+       elif pyt2>90.0:
+          j2col = False
+          
+          
+       
     
     
     #---Collision balle - fenetre DROIT
        if ballepos[H] + balle_rayon >= fenetre_l:
           ballepos[H] = fenetre_l - balle_rayon
-          balle_vitesse[H] = -balle_vitesse[H]
+          balle_vitesse[H] = -balle_vitesse[H] * 0.8
     #---Collision balle - fenetre GAUCHE
        else:
-        if ballepos[H] < balle_rayon:
-           ballepos[H] = balle_rayon
-           balle_vitesse[H] = -balle_vitesse[H]
+          if ballepos[H] < balle_rayon:
+             ballepos[H] = balle_rayon
+             balle_vitesse[H] = -balle_vitesse[H] * 0.8
     #---Collision balle - fenetre BAS
-        if ballepos[V] + balle_rayon >= sol2_position[1]:
-           ballepos[V] = sol2_position[1] - balle_rayon
-           balle_vitesse[V] = -balle_vitesse[V]*reduc_vitesse/10
-           reduc_vitesse-=1
-           if reduc_vitesse == -1:
-              reduc_vitesse = 0
+          if ballepos[V] + balle_rayon >= sol2_position[1]:
+             ballepos[V] = sol2_position[1] - balle_rayon
+             balle_vitesse[V] = -balle_vitesse[V]*reduc_vitesse/10
+             reduc_vitesse-=1
+             if reduc_vitesse < 0:
+                reduc_vitesse = 0
           
        if joueur2pos[V] >= sol2_position[1]-joueur_rayon:
           joueur2pos[V] = sol2_position[1]-joueur_rayon
@@ -325,31 +496,75 @@ while not fini:
           air1 = False
         
     #---Collision balle - fenetre HAUT
-       else:
-           if ballepos[V] < balle_rayon:
-              ballepos[V] = balle_rayon
-              balle_vitesse[V] = -balle_vitesse[V]    
-    
+       
+       if ballepos[V] < balle_rayon:
+          ballepos[V] = balle_rayon
+          balle_vitesse[V] = -balle_vitesse[V] * 0.8   
+
+    #---Collision dessus goal 1
+       if ballepos[V] > 450 and ballepos[V] < 480 and ballepos[H] < 130:
+          ballepos[V] = 452
+          balle_vitesse[V] = -balle_vitesse[V] * reduc_vitesse/10
+          reduc_vitesse -= 1
+          if reduc_vitesse < 0:
+             reduc_vitesse = 0
+    #---Balle dans le Goal 1
+       if ballepos[V] >= 470 and ballepos[H] <= 130:
+          score2 += 1
+          ballepos=[640.0, 50.0]
+          balle_vitesse=[0.0 , 0.0]
+          joueur1pos = [ 180 , fenetre_h - 113]
+          joueur2pos = [ fenetre_l - 300 , fenetre_h - 113]
+          joueur1_vitesse = [10.0 , 0.0]
+          joueur2_vitesse = [10.0 , 0.0]
+          message = pygame.image.load('message.png').convert_alpha(fenetre)
+          message = pygame.transform.scale(message,(300,130))
+          fenetre.blit(message,(545,210))
+          time.sleep(2)
+
+    #---Collision dessus goal 2
+       if ballepos[V] > 450 and ballepos[V] < 480 and ballepos[H] > fenetre_l - 130 :
+          ballepos[V] = 452
+          balle_vitesse[V] = -balle_vitesse[V] * reduc_vitesse/10
+          reduc_vitesse -= 1
+          if reduc_vitesse < 0:
+             reduc_vitesse = 0
+    #---Balle dans le goal 2
+       if ballepos[V] >= 470 and ballepos[H] >= fenetre_l - 130:
+          score1 += 1
+          ballepos=[640.0, 50.0]
+          balle_vitesse=[0.0 , 0.0]
+          joueur1pos = [ 180 , fenetre_h - 113]
+          joueur2pos = [ fenetre_l - 300 , fenetre_h - 113]
+          joueur1_vitesse = [10.0 , 0.0]
+          joueur2_vitesse = [10.0 , 0.0]
+          message = pygame.image.load('message.png').convert_alpha(fenetre)
+          message = pygame.transform.scale(message,(300,130))
+          fenetre.blit(message,(545,210))
+          time.sleep(2)
+          
     
     
     #---Dessin a chaque tour (60/sec)
     #---Dessin l ecran
        fenetre.fill(blanc)
+    #--- Messages
+
     #---Dessin balle
        pygame.draw.circle(fenetre, noir, (int(ballepos[H]), int(ballepos[V])), balle_rayon)
        pygame.draw.circle(fenetre, blanc, (int(ballepos[H]), int(ballepos[V])), balle_rayon-5)
     #---Dessin joueurs + goal
        fenetre.blit(joueur1, joueur1pos)
        fenetre.blit(joueur2, joueur2pos)
-       fenetre.blit(goal1 , (0,sol2_position[V]-220))
-       fenetre.blit(goal2 , (fenetre_l-160,sol2_position[V]-220))
-       
+       fenetre.blit(goal1 , (-30.0,sol2_position[V]-215.0))
+       fenetre.blit(goal2 , (fenetre_l-130.0,sol2_position[V]-215.0))
     
     #--- Dessin sol    
        pygame.draw.rect(fenetre, blanc, (sol2_position, (1500, 200)))
        pygame.draw.rect(fenetre, noir, (sol_position, (1500, 200)))
        score()
-    #--- Afficher (rafraichir) l cran
+
+    #--- Afficher (rafraichir) l écran
     pygame.display.flip()
     
     
