@@ -56,16 +56,6 @@ menu = True
 j1col = False
 j2col = False
 son = True
-CENTR = 0
-GAUCH = 1
-DROIT = 2
-DESSU = 4
-HAUT_GAUCH = 5
-HAUT_DROIT = 6
-DESSOU = 8
-DESSOUS_GAUCH = 9
-DESSOUS_DROIT = 10
-
 
 #DEFINITIONS
 
@@ -244,7 +234,7 @@ def collisionJoueur(x1pos , y1pos, numjoueur):
 
          #---Calcul vecteur arrivee balle
          va = math.sqrt( (ax*ax) + (ay*ay)) * 0.8
-         print('va: ' + str(va))
+         #print('va: ' + str(va))
          if va < 0.15:
             va = 25.0
          #---Decomposition X Y du vecteur rebond balle
