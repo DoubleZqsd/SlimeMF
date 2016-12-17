@@ -285,7 +285,23 @@ def score():
    fenetre.blit(scores,(542,85))
    pygame.display.flip()
    
-
+    
+def gooal():
+    global son
+    if son : 
+       pygame.mixer.Sound.play(man)
+    fenetre.fill(blanc)
+    pygame.draw.circle(fenetre, noir, (int(ballepos[H]), int(ballepos[V])), balle_rayon)
+    pygame.draw.circle(fenetre, blanc, (int(ballepos[H]), int(ballepos[V])), balle_rayon-5)
+    fenetre.blit(joueur1, joueur1pos)
+    fenetre.blit(joueur2, joueur2pos)
+    pygame.draw.rect(fenetre, blanc, (sol2_position, (1500, 200)))
+    fenetre.blit(goal1 , (-30.0,455))
+    fenetre.blit(goal2 , (fenetre_l-130.0,455))
+    pygame.draw.rect(fenetre, noir, (sol_position, (1500, 200)))
+    fenetre.blit(message,(490,255))
+    score()
+    pygame.display.flip()
 #---Touches Clavier
 
 def _nouveauEtatTouche():
@@ -567,7 +583,7 @@ while not fini:
           joueur2pos = [ fenetre_l - 300 , fenetre_h - 113]
           joueur1_vitesse = [10.0 , 0.0]
           joueur2_vitesse = [10.0 , 0.0]
-          fenetre.blit(message,(535,310))          
+          gooal()          
           time.sleep(1)
     #---Balle dans le Goal 1
        if ballepos[V] >= 440 and ballepos[H] <= 85:
@@ -580,7 +596,7 @@ while not fini:
           joueur2pos = [ fenetre_l - 300 , fenetre_h - 113]
           joueur1_vitesse = [10.0 , 0.0]
           joueur2_vitesse = [10.0 , 0.0]          
-          fenetre.blit(message,(535,310))          
+          gooal()          
           time.sleep(1)
 
 
